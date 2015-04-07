@@ -1,2 +1,2 @@
 # angular-socket.io
-Service for angular for socket.io with multiple tabs support
+Service for angular with multiple tabs support events with/without socket.io
