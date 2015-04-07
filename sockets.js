@@ -38,6 +38,10 @@
     };
 
     Socket.prototype.initSockets = function () {
+        if(!window.io) {
+            console.log('Websockets not found.Please check support socket.io.');
+            return;
+        }
         this.socket = window.io.connect(this.options.url, this.options.socket || {});
         this.socket.on('connect', function(){
           console.log('Websocket connecting...');
@@ -69,9 +73,11 @@
 
     Socket.prototype.addListener = function (e) {
         var self = this;
-        this.socket.on(e, function (response) {
-            self.socketEvent(e, response);
-        });
+        if(this.socket) {
+            this.socket.on(e, function (response) {
+                self.socketEvent(e, response);
+            });
+        }
     };
 
     Socket.prototype.setSlave = function () {
