@@ -8,6 +8,7 @@
 
         this.options = options || {};
         this.master = false;
+        this.emits = [];
         this.listeners = {};
         this.storage = window.localStorage || false;
         this.init();
@@ -38,13 +39,15 @@
     };
 
     Socket.prototype.initSockets = function () {
+        var self = this;
         if(!window.io) {
             console.log('Websockets not found.Please check support socket.io.');
             return;
         }
         this.socket = window.io.connect(this.options.url, this.options.socket || {});
         this.socket.on('connect', function(){
-          console.log('Websocket connecting...');
+            console.log('Websocket connecting...');
+            self.checkEmits();
         });
 
         this.socket.on('disconnect', function(){
@@ -63,6 +66,7 @@
         this.masterTimer = setInterval(set, 2000);
         this.initSockets();
         this.addListeners();
+        console.log('set master');
     };
 
     Socket.prototype.addListeners = function () {
@@ -92,6 +96,7 @@
         }
         this.slaveTimer = setInterval(checkMaster, 5000);
         checkMaster();
+        console.log('set slave');
     };
 
     Socket.prototype.on = function (e, callback) {
@@ -144,9 +149,25 @@
         this.storage.setItem(this.options.storageKey + ':' + e, JSON.stringify(response));
     };
 
+    Socket.prototype.emit = function (name, data) {
+        if(this.socket) {
+            this.socket.emit(name, data);
+        } else {
+            this.emits.push({
+                name : name,
+                data : data
+            });
+        }
+    };
+    Socket.prototype.checkEmits = function () {
+        while(this.emits.length) {
+            var emitObj = this.emits.pop();
+            this.emit(emitObj.name, emitObj.data);
+        }
+    }
     app.factory('socket',['$window', function ($window) {
         var socket = new Socket({
-            url : $window.location.origin,
+            url : $window.location.origin.replace($window.location.port, '1337'),
             storageKey : 'news',
             socket : {
                 query : 'token=' + localStorage.accessToken,
@@ -155,6 +176,7 @@
         });
         return {
             on : socket.on.bind(socket),
+            emit : socket.emit.bind(socket),
             off : socket.off.bind(socket)
         };
     }]);
