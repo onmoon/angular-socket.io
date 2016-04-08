@@ -1,2 +1,11 @@
-# angular-socket.io
-Service for angular with multiple tabs support events with/without socket.io
+# multitab-socket.io
+
+        var socket = new Socket();
+        
+        socket.on('hi', function(m) {
+          console.log(m);
+        });
+        
+        socket.emit('da',{t:4});
+        
+        socket.init();
