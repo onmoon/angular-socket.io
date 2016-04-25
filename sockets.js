@@ -1,4 +1,4 @@
-(function () {
+(function() {
   'use strict';
 
   function extend(obj, props) {
@@ -189,7 +189,9 @@
     if (!this.storage) {
       return;
     }
+
     this.debug('check storage...');
+
     // go through all storage keys
     for (var key in this.storage) {
       if(key.match(this.storageKey)) {
@@ -307,7 +309,7 @@
     }
     return this;
   };
-  
-  window.sockets = Socket;
-  
+
+  window.socket = new Socket();
+
 })();
